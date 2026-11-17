@@ -1,311 +1,221 @@
-# RPLIDAR S2E w TouchDesignerze na Windows – zestaw dla studentów
+# RPLIDAR S2E w TouchDesignerze
 
-Lidar 2D **Slamtec RPLIDAR S2E** podłączony kablem **Ethernet**, czytany
-**bezpośrednio w TouchDesignerze** – bez Pythona, bez ROS, bez SDK, bez
-instalowania czegokolwiek w systemie. Skan na żywo, nauka tła pustego
-pomieszczenia, wykrywanie i śledzenie ludzi, wyjście OSC i gotowy projekt
-do przerabiania.
+Ethernetowy lidar 2D Slamteca zamknięty w jednym `.tox`: skan 1024 kubełków,
+30 m zasięgu, nauka tła, wykrywanie i śledzenie ludzi, OSC. Cały kod siedzi
+w DAT-ach komponentu i korzysta tylko z `socket` i `numpy`.
 
-| Co widzi czujnik | Demo reagujące na ludzi |
+| Widok z góry | Demo |
 |---|---|
-| ![widok z góry](docs/widok.png) | ![demo](docs/demo.png) |
+| ![widok](docs/widok.png) | ![demo](docs/demo.png) |
 
-*Po lewej: biały – skan na żywo, niebieski – nauczone tło, czerwony – to, czego
-w pustym pokoju nie było, zielone kółka – śledzone obiekty.*
+Biały – skan na żywo, niebieski – nauczone tło, czerwony – obiekty,
+zielone kółka – śledzone bloby.
 
-> **S2E to wersja ethernetowa.** Nie ma portu COM, nie ma przejściówki USB
-> i nie ma czym kręcić silnikiem – głowica kręci się, odkąd czujnik ma prąd.
-> Jeśli masz A1, A2 albo A3 na USB, to jest osobna paczka:
-> [rplidar-windows](https://github.com/technofania/rplidar-windows).
+Wersja na USB (A1 / A2 / A3) jest osobno: [rplidar-windows](https://github.com/technofania/rplidar-windows).
 
----
+## Wymagania
 
-## Czego potrzebujesz
+- Windows 10/11
+- RPLIDAR S2E z zasilaczem z zestawu — Ethernet nie zasila czujnika, to nie PoE
+- kabel Ethernet i gniazdo LAN w komputerze albo przejściówka USB-Ethernet
+- [TouchDesigner](https://derivative.ca/download) 2022.20000+ (testowane na 2025.32460)
+- prawa administratora jednorazowo, przy dodawaniu adresu IP karcie
 
-- Windows 10 lub 11 (64-bit)
-- RPLIDAR **S2E** z zasilaczem z zestawu
-- kabel Ethernet (zwykły patchcord) i **gniazdko LAN w komputerze** –
-  laptop bez gniazdka potrzebuje przejściówki USB-Ethernet
-- [TouchDesigner](https://derivative.ca/download) **2022.20000 lub nowszy**
-  (darmowa wersja Non-Commercial w zupełności wystarczy; testowane na 2025.32460)
-- **jednorazowo prawa administratora** – tylko po to, żeby dodać komputerowi
-  adres IP w podsieci czujnika. Nic poza tym nie wymaga UAC.
+## Start
 
-> Czujnik **musi mieć własny zasilacz**. Ethernet nie zasila go po kablu
-> (to nie jest PoE), a głowica bez prądu nie kręci się wcale.
+S2E ma na stałe adres **192.168.11.2** i o nic nie prosi: nie pyta o DHCP, nie rozgłasza
+się. Komputer musi mieć własny adres w tej samej podsieci. Instalator **dodaje**
+`192.168.11.5` obok istniejących adresów, więc Wi-Fi, internet i DHCP chodzą dalej,
+a cofnięcie to usunięcie jednego adresu.
 
-## Dlaczego w ogóle trzeba cokolwiek ustawiać
+1. **Code → Download ZIP**, rozpakuj.
+2. Zasilacz do gniazdka, kabel Ethernet do komputera. Głowica powinna ruszyć.
+3. `INSTALUJ.bat` — UAC wyskakuje raz, przy kroku 1/4. Dalej: szukanie czujnika,
+   sprawdzenie TD, skróty na pulpicie.
+4. Otwórz `td\RPLidarS2E.toe`.
+5. Wyjdź z zasięgu czujnika i pulsnij **Naucz tło** (3 s pustego pomieszczenia).
+   Dopóki tego nie zrobisz, obiektem jest każda ściana.
 
-S2E ma adres **192.168.11.2** wpisany na stałe i sam o nic nie prosi – nie
-pyta o DHCP, nie rozgłasza się w sieci. Żeby komputer mógł do niego mówić,
-musi mieć własny adres w tej samej podsieci, czyli **192.168.11.x**.
+Ręcznie, bez instalatora: Ustawienia → Sieć i internet → Ethernet → **Edytuj** przy
+„Przypisanie IP" → Ręcznie → IPv4 → adres `192.168.11.5`, maska `255.255.255.0`,
+bez bramy i DNS.
 
-Instalator **dodaje** adres `192.168.11.5` obok istniejących, zamiast je
-zastępować. Dzięki temu Wi-Fi, internet i DHCP działają dalej bez zmian,
-a cofnięcie zmiany to usunięcie jednego adresu.
-
-## Instalacja (3 minuty)
-
-1. **Pobierz paczkę:** zielony przycisk **Code → Download ZIP** na tej stronie.
-2. **Rozpakuj** ZIP: prawy klik → *Wyodrębnij wszystko…* → np. do `Dokumenty`.
-   Nie uruchamiaj niczego z wnętrza ZIP-a.
-3. **Podłącz czujnik**: zasilacz do gniazdka, kabel Ethernet do komputera.
-   Głowica powinna zacząć się kręcić (słychać szum), a dioda na gnieździe LAN
-   zamrugać.
-4. Kliknij dwa razy **`INSTALUJ.bat`**.
-   - Jeśli pojawi się *„System Windows ochronił ten komputer"*: **Więcej informacji → Uruchom mimo to**.
-   - Przy kroku 1/4 wyskoczy **okno UAC** – to ten jedyny moment, w którym
-     potrzebne są prawa administratora.
-5. Instalator ustawi adres karty, znajdzie czujnik, sprawdzi TouchDesignera
-   i zrobi skróty na pulpicie.
-6. Otwórz **`td\RPLidarS2E.toe`** (albo skrót *„RPLIDAR S2E – projekt TouchDesigner"*).
-
-To wszystko. Żadnego `pip`, żadnego `venv`, żadnego SDK Slamteca.
-
-### Jeśli wolisz ustawić adres ręcznie
-
-Ustawienia → Sieć i internet → Ethernet → **Edytuj** przy „Przypisanie IP" →
-Ręcznie → IPv4 włączone → adres `192.168.11.5`, maska `255.255.255.0`,
-bramy i DNS **nie wpisuj**. Potem uruchom `sprawdz-lidar.bat`.
-
-## Pierwsze uruchomienie
-
-Po otwarciu projektu kliknij na komponent **`s2e`** i spójrz na DAT **`status`**
-w środku – to jedyne miejsce, do którego warto zaglądać, gdy coś nie działa.
-Powinno być:
+Stan sterownika na żywo: DAT `status` w komponencie.
 
 ```
 DZIALA  adres 192.168.11.2  tryb Sensitivity (30 m)
-stan sterownika: skanuje
 obroty: 606 rpm   obrotow: 118   probek: 374112   bledow: 0
 czujnik: RPLIDAR S2E, firmware 1.02, hardware 18
 zdrowie czujnika: OK (kod 0)
-
-TLO: nie nauczone - wszystko w zasiegu jest "obiektem".
 ```
 
-Teraz **wyjdź z zasięgu czujnika** i pulsnij **„Naucz tło"** (strona *Tlo i obiekty*).
-Przez 3 sekundy komponent zapamiętuje, jak wygląda puste pomieszczenie. Od tej chwili
-„obiektem" jest tylko to, czego w nim nie było – czyli ludzie.
-
-Tło zapisuje się razem z projektem (siedzi w DAT-cie `bg_data`), ale **po przestawieniu
-czujnika albo przemeblowaniu trzeba nauczyć je od nowa** – zapisane tło nie wie
-o przeprowadzce.
+Tło siedzi w DAT-cie `bg_data` i zapisuje się razem z projektem. Po przestawieniu
+czujnika albo przemeblowaniu — naucz od nowa.
 
 ## Komponent `s2e`
 
-Przeciągnij **`td\rplidar_s2e.tox`** do własnego projektu i masz wszystko poniżej.
-Komponent jest samowystarczalny – cały kod siedzi w DAT-ach w środku.
+`td\rplidar_s2e.tox` jest samowystarczalny, przeciągnij go do swojego projektu.
 
-### Co z niego wychodzi
+### Wyjścia
 
-| Operator | Co daje |
+| Operator | Zawartość |
 |---|---|
-| `scan` | CHOP, kanał `dist`: **1024 kubełki** odległości w mm, kubełek `k` = kąt `k · 360/1024`, `0` = brak odbicia |
-| `objects` | CHOP, próbka na slot: `active id x y dist angle width age speed`. `x`,`y` w **metrach**, `x` w prawo, `y` do przodu czujnika |
+| `scan` | CHOP, kanał `dist`: 1024 kubełki odległości w mm, kubełek `k` = kąt `k · 360/1024`, `0` = brak odbicia |
+| `objects` | CHOP, próbka na slot: `active id x y dist angle width age speed`. `x`, `y` w metrach, `x` w prawo, `y` do przodu czujnika |
 | `info` | CHOP: `ok rpm revs samples errors objects points background learning` |
-| `view` | TOP 720×720: widok z góry |
-| `cloud` | TOP 1024×1 RGBA32F: `R`=x[m] `G`=y[m] `B`=odległość[m] `A`=1 odbicie / 2 obiekt – gotowe pod instancing i GLSL |
+| `view` | TOP 720×720, widok z góry |
+| `cloud` | TOP 1024×1 RGBA32F: `R`=x[m] `G`=y[m] `B`=odległość[m] `A`=1 odbicie / 2 obiekt |
 | `objdata` | TOP *Slots*×1 RGBA32F: `R`=x[m] `G`=y[m] `B`=szerokość[m] `A`=1 gdy slot zajęty |
-| `status` | DAT: stan czujnika po polsku |
-| `oscout` | wysyła `objects` po OSC, gdy zaznaczysz *Wysyłaj OSC* |
+| `status` | DAT ze stanem sterownika |
+| `oscout` | wysyła kanały `objects` po OSC, gdy zaznaczysz *Wysyłaj OSC*; adresy = nazwy kanałów |
 
-### Parametry
+### Parametry — Lidar
 
-**Lidar**
-
-| Parametr | Co robi |
+| Parametr | Działanie |
 |---|---|
-| **Active** | wyłączenie zamyka połączenie – przydatne, gdy chcesz uruchomić `sprawdz-lidar.bat` |
-| **Adres czujnika** | `auto` = szukaj sam (zalecane). Można wpisać `192.168.11.2` na sztywno |
+| **Active** | wyłączenie zamyka połączenie |
+| **Adres czujnika** | `auto` albo wpisany na sztywno, np. `192.168.11.2` |
 | **Znajdź czujnik** | przeszukuje sensowne adresy i wpisuje znaleziony |
-| **Tryb skanu** | `auto` bierze tryb zalecany przez czujnik (na S2E: *Sensitivity*). Patrz niżej |
+| **Tryb skanu** | `auto` bierze tryb zalecany przez czujnik, na S2E *Sensitivity* |
 | **Restart sterownika** | zamyka i otwiera połączenie od nowa |
 
-**Tlo i obiekty**
+### Parametry — Tlo i obiekty
 
-| Parametr | Co robi |
+| Parametr | Działanie |
 |---|---|
-| **Naucz tło** | 3 s nauki **pustego** pomieszczenia |
-| **Wyczyść tło** | po tym wszystko w zasięgu jest znowu „obiektem" |
-| **Używaj tła** | wyłączone = wykrywaj wszystko w zasięgu (dobre do pierwszego sprawdzenia, bezużyteczne w instalacji) |
-| **Margines tła** | o ile mm bliżej niż tło musi coś być, żeby liczyło się jako nowe. Za mało → ściany migoczą; za dużo → człowiek przy ścianie znika |
-| **Zasięg min / max** | odcina odbicia od obudowy i te z drugiego końca sali |
-| **Min. / max. szerokość obiektu** | w kubełkach. Min 6 odsiewa pojedyncze zgubione próbki, max 160 odsiewa „całą ścianę" |
+| **Naucz tło** / **Wyczyść tło** | 3 s nauki pustego pomieszczenia / powrót do stanu bez tła |
+| **Używaj tła** | wyłączone = obiektem jest wszystko w zasięgu |
+| **Margines tła** | o ile mm bliżej niż tło musi coś być, żeby liczyło się jako nowe. Za mało → ściany migoczą, za dużo → człowiek przy ścianie znika |
+| **Zasięg min / max** | odcina odbicia od obudowy i z drugiego końca sali |
+| **Min. / max. szerokość obiektu** | w kubełkach; min 6 odsiewa zgubione próbki, max 160 odsiewa całą ścianę |
 | **Dopuszczalna dziura** | ile pustych kubełków wolno przeskoczyć, sklejając jeden obiekt |
-| **Głębokość przedniej powierzchni** | liczy się tylko to, co jest najbliżej – inaczej środek obiektu wędrowałby po całym ramieniu |
+| **Głębokość przedniej powierzchni** | liczy się tylko to, co najbliżej; inaczej środek obiektu wędruje po ramieniu |
 
-**Sledzenie** – `Slots` (ile obiektów naraz), `Max. przeskok` (ile metrów obiekt może
-przeskoczyć i wciąż być sobą), `Zwolnienie numeru po` (jak długo trzymać numer, gdy
-obiekt zniknął), `Wygładzanie`.
-
-**Widok** – zasięg widoku z góry, czy rysować tło i kółka obiektów.
-
-**OSC** – adres i port odbiorcy. Adresy wiadomości to nazwy kanałów `objects`.
+**Sledzenie**: `Slots` (ile obiektów naraz), `Max. przeskok` (ile metrów obiekt może
+przeskoczyć i wciąż być sobą), `Zwolnienie numeru po`, `Wygładzanie`.
+**Widok**: zasięg, rysowanie tła i kółek. **OSC**: adres i port odbiorcy.
 
 ### Tryby skanu
 
-Czujnik sam podaje listę swoich trybów – `sprawdz-lidar.bat` ją wypisuje.
-Na egzemplarzu z firmware 1.02 jest ich cztery:
+Czujnik sam podaje listę swoich trybów, `sprawdz-lidar.bat` ją wypisuje.
+Firmware 1.02 ma cztery:
 
-| Tryb | Zasięg | Format ramki | Czyta go komponent? |
+| Tryb | Zasięg | Format ramki | Obsługiwany |
 |---|---|---|---|
-| Standard | 16 m | 5 bajtów na próbkę | tak, ale to awaryjny – jeden datagram na próbkę to marnotrawstwo na Ethernecie |
+| Standard | 16 m | 5 B na próbkę | tak, awaryjnie — jeden datagram na próbkę |
 | DenseBoost | 30 m | kapsuła 84 B, 40 próbek | tak |
-| UltraDense | 30 m | kapsuła 165 B | **nie** |
-| **Sensitivity** | **30 m** | **ramka HQ 781 B, 96 próbek** | **tak – domyślny, zalecany przez czujnik** |
+| UltraDense | 30 m | kapsuła 165 B | nie |
+| Sensitivity | 30 m | ramka HQ 781 B, 96 próbek | tak, domyślny i zalecany przez czujnik |
 
-Zostaw **auto**. Sensitivity daje 30 metrów zasięgu, 32 000 próbek na sekundę
-i kąt oraz odległość wprost w każdej próbce – nie ma powodu wybierać czegoś innego.
+Zostaw `auto`. Sensitivity daje 30 m, 32 000 próbek/s i kąt oraz odległość wprost
+w każdej próbce.
 
-## Pomysły na instalacje
-
-- **Ludzie jako wejście:** naucz tło → `objects` → `x`, `y` sterują dźwiękiem,
-  światłem, obrazem. `info/objects` = „ilu ludzi w kadrze".
-- **Ściana dotykowa:** powieś lidar **płasko na ścianie**, kilka cm przed płaszczyzną
-  projekcji. Dłoń dotykająca ściany wchodzi w płaszczyznę skanu i jest wykrywana jako
-  obiekt. Trzeba dorobić kalibrację lidar↔projektor.
-- **Bramka / licznik przejść:** wąski wycinek kąta + `age` i `speed` z `objects`.
-- **Duża przestrzeń:** 30 metrów zasięgu to zupełnie inna skala niż 6 metrów A2 –
-  jeden S2E obsłuży całą salę gimnastyczną.
-- **Własny wygląd:** `cloud` jako źródło instancji (1024 punkty), `objdata` w swoim
-  GLSL-u – tak zrobione jest demo w `RPLidarS2E.toe` (plik `td/src/demo.frag`, 40 linii).
-
-## Diagnostyka bez TouchDesignera
-
-**`sprawdz-lidar.bat`** – czysty PowerShell, działa na świeżym Windowsie, zanim
-cokolwiek zainstalujesz. Pokazuje po kolei, gdzie się zatrzymuje:
-
-```
-=== 1/5 Siec tego komputera ===
-  [OK] jest adres w podsieci czujnika: 192.168.11.5 na Ethernet
-
-=== 2/5 Ping do czujnika ===
-  [OK] 192.168.11.2 odpowiada na ping
-       MAC czujnika: 52-50-78-7A-51-48
-
-=== 3/5 Szukam czujnika ===
-  [OK] 192.168.11.2 -> RPLIDAR S2E
-       firmware 1.02, hardware 18
-  [OK] zdrowie: OK
-       ustawienia czujnika: ip 192.168.11.2  maska 255.255.255.0  brama 192.168.11.1
-
-=== 4/5 Tryby skanu ===
-       [0] Standard        62.00 us/probke   do   16 m   format 0x81
-       [1] DenseBoost      31.00 us/probke   do   30 m   format 0x85
-       [2] UltraDense      31.00 us/probke   do   30 m   format 0x86
-       [3] Sensitivity     31.00 us/probke   do   30 m   format 0x83  <- zalecany przez czujnik
-
-=== 5/5 Odbior danych (4 s, tryb Sensitivity) ===
-  [OK] ramek: 1335 (334/s), probek: 128160 (32,017/s)
-  [OK] obrotow: 40.3, ~605 rpm
-  [OK] pokrycie kata: 96% z 360 stopni
-       odleglosci: 107 - 7,248 mm
-```
-
-Odznacz **Active** na komponencie (albo zamknij TD), zanim to uruchomisz.
-UDP **nie jest na wyłączność** – w odróżnieniu od portu COM nic się nie
-zablokuje – ale czujnik wysyła strumień temu, kto ostatni poprosił, więc
-TouchDesigner i diagnostyka naraz będą sobie dane wyrywać.
-
-## Typowe problemy
-
-| Objaw | Co zrobić |
-|---|---|
-| `status` mówi „BRAK POLACZENIA", głowica się kręci | Komputer nie ma adresu w podsieci czujnika. Uruchom `INSTALUJ.bat` albo ustaw `192.168.11.5` ręcznie. |
-| Ping do `192.168.11.2` nie przechodzi | Kabel Ethernet nie wpięty albo wpięty w inne gniazdo niż to, które dostało adres. Sprawdź diody na gnieździe LAN. |
-| Głowica nie kręci się wcale | Brak zasilania. Ethernet **nie zasila** czujnika – zasilacz z zestawu musi być w gniazdku. |
-| Instalator mówi „nie widzę karty Ethernet z wpiętym kablem" | Laptop bez gniazdka LAN – potrzebna przejściówka USB-Ethernet. Albo kabel wpięty do switcha, który nie jest podłączony do komputera. |
-| Adres się ustawił, ale po restarcie znikł | Adres dodany przez `New-NetIPAddress` jest trwały. Jeśli znika, ktoś/coś przestawia kartę na DHCP – sprawdź oprogramowanie producenta laptopa. |
-| Strumień jest rwany, `bledow` rośnie | Dwa programy naraz czytają czujnik (drugi TouchDesigner, otwarta diagnostyka). Czujnik wysyła dane ostatniemu, kto poprosił. |
-| Czujnik jest w sieci razem z innymi urządzeniami i gubi dane | 32 000 próbek na sekundę to ~20 Mbit/s **ciągłego** UDP. Przez przeciążony switch albo Wi-Fi to nie przejdzie. Najlepiej kabel prosto do komputera. |
-| Dane w TD zamarzły, obraz płynie dalej | Script CHOP/TOP **bez wejścia nigdy nie jest oznaczany jako brudny**. Komponent gotuje je na piechotę w Execute DAT `exec` – jeśli przepisujesz kod do siebie, nie zgub tego. |
-| TouchDesigner zapisał projekt „with errors" | Pamięć operatora jest marynowana do `.toe`, a socket, wątek i Tracker się nie marynują. Komponent czyści to w `onProjectPreSave` – jeśli przepisujesz kod, przepisz też to. |
-| Wszystko jest „obiektem", cały pokój świeci na czerwono | Tło nie jest nauczone. Wyjdź z kadru i pulsnij **Naucz tło**. |
-| Po nauce tła nic nie jest wykrywane | Tło nauczone z Tobą w kadrze – stoisz teraz tam, gdzie „zawsze była ściana". Naucz jeszcze raz, przy pustym pomieszczeniu. |
-| Obiekty pojawiają się tam, gdzie nikogo nie ma | Kierunki, w których podczas nauki nie było żadnego odbicia, traktowane są jako otwarta przestrzeń – tam **każde** odbicie jest nowe. Zmniejsz **Zasięg max** albo zwiększ **Margines tła**. |
-| Lidar widzi tylko wycinek z 360° | Normalne, gdy stoi w kącie albo przy ścianie. Jeśli nie – coś zasłania głowicę: taśma, własny kabel, obudowa. Sprawdź pokrycie w `sprawdz-lidar.bat`. |
-| Czarne, szklane albo lustrzane powierzchnie nie są widziane | Tak działa lidar – czarny materiał nie odbija, szkło przepuszcza, lustro odbija w bok. Nie da się tego wyregulować, trzeba to obejść ustawieniem czujnika. |
-| TD nie otwiera `.toe` | Za stara wersja. Zaktualizuj albo przeciągnij `td\rplidar_s2e.tox` do pustego projektu. |
-
-## Dla zaawansowanych
-
-### Ile właściwie widzi S2E
+## Parametry czujnika
 
 Zmierzone na firmware 1.02, tryb Sensitivity:
 
 | | |
 |---|---|
-| obroty głowicy | 10,1 na sekundę (606 rpm), **nie da się zmienić** |
+| obroty głowicy | 10,1 /s (606 rpm), nie do zmiany |
 | próbek na sekundę | 32 000 |
-| próbek na obrót | ~3170, czyli **0,11°** między próbkami |
-| datagramów na sekundę | 333 (po 781 bajtów) |
+| próbek na obrót | ~3170, czyli 0,11° między próbkami |
+| datagramów na sekundę | 333 po 781 B, ~20 Mbit/s ciągłego UDP |
 | zasięg | 0,1 – 30 m |
 
-Dla porównania: A2 przy fabrycznych obrotach daje 1,2°, a po zwolnieniu silnika
-0,67°. S2E jest od tego sześć razy gęstszy i nie trzeba nic kombinować z PWM –
-**komenda sterowania obrotami (`0xA8`) na tym egzemplarzu nic nie robi**,
-głowica zawsze kręci się 10 razy na sekundę.
+Komenda sterowania obrotami (`0xA8`) na tym egzemplarzu nic nie robi.
+Kubełków jest 1024 (0,35°), czyli średnio trzy próbki na kubełek. Przy 2048 część
+kubełków byłaby pusta, a `scan` i `cloud` urosłyby bez zysku.
 
-Kubełków jest **1024** (0,35°), czyli średnio **trzy próbki na kubełek**.
-Można by zrobić 2048, ale wtedy część kubełków byłaby pusta i trzeba by więcej
-interpolować, a `scan` i `cloud` urosłyby bez zysku.
+Dla porównania: A2 daje 1,2° fabrycznie, 0,67° po zwolnieniu silnika.
 
-### Jak to jest zrobione
+## Zastosowania
 
-- **Bez SDK i bez pyserial.** Protokół S2E to zwykły protokół RPLIDAR-a opakowany
-  w datagramy UDP – ta sama ramka `0xA5 <komenda> …`, ten sam deskryptor
-  odpowiedzi `0xA5 0x5A`. Wystarczy `socket` ze standardowego Pythona.
-- **Osobny wątek.** Zatkane gotowanie sieci nie może gubić danych skanu, więc
-  czytanie socketu chodzi w tle, a `scan` tylko przepisuje ostatni stan.
-- **Jeden trwały pierścień 1024 kubełków** ze znacznikiem obrotu na każdym, zamiast
-  podwójnego bufora przepisywanego co obrót. Dzięki temu nie ma szwu na 0°, a kubełek,
-  który przestał zwracać odbicie, po prostu się starzeje i gaśnie.
-- **Rejestr sterownika w `builtins`.** Przeładowanie DAT-u albo skasowanie komponentu
-  zostawiało wcześniej żywy wątek, który dalej wyrywał czujnikowi strumień.
-  Teraz sterownik da się odnaleźć i zamknąć zawsze.
-- **Wątek zamyka socket sam.** Zamknięcie socketu pod działającym wątkiem zostawia
-  go w pętli mielącej wyjątki.
+- Pozycje ludzi: `objects` → `x`, `y`; `info/objects` = ilu w kadrze.
+- Duże przestrzenie: 30 m zasięgu obsłuży całą salę gimnastyczną z jednego czujnika.
+- Ściana dotykowa: lidar płasko na ścianie, kilka cm przed płaszczyzną projekcji.
+  Kalibrację lidar↔projektor trzeba dorobić.
+- Bramka / licznik przejść: wąski wycinek kąta + `age` i `speed`.
+- Własna grafika: `cloud` jako źródło instancji, `objdata` w swoim GLSL-u —
+  tak zrobione jest demo (`td/src/demo.frag`, 40 linii).
 
-### Protokół – co warto wiedzieć
+## Diagnostyka bez TouchDesignera
 
-Sprawdzone na S2E, firmware 1.02, hardware 18:
+`sprawdz-lidar.bat` — czysty PowerShell: adres karty, ping, model, firmware, health,
+lista trybów, 4 s odbioru z pokryciem kąta.
 
-- **Kanał UDP jest przezroczysty.** Slamtec w swoim SDK (`sl_udp_channel.cpp`)
-  traktuje go dokładnie jak port szeregowy: te same komendy, te same odpowiedzi.
-  W praktyce **każdy datagram to dokładnie jedna ramka**, więc nie trzeba nawet
-  sklejać strumienia.
-- **Tryb Sensitivity nadaje ramki HQ, nie kapsuły express.** Ramka ma 781 bajtów:
-  `0xA5`, znacznik czasu (u64), 96 próbek po 8 bajtów (kąt Q14 u16, odległość Q2
-  u32, jakość u8, flagi u8), CRC32.
-- **Kąt i odległość są w każdej próbce wprost** – nie trzeba, jak przy kapsułach
-  express z A2, rozkładać kątów między kapsułami. Kąt = `angle_q14 · 90 / 2^14`
-  stopni, odległość = `dist_q2 / 4` milimetrów.
-- **Bit 0 flag to bit synchronizacji** i on **naprawdę się zapala**, raz na obrót –
-  w odróżnieniu od kapsuł express z A2, gdzie nie zapalał się nigdy.
-- **CRC32 Slamteca to zwykły CRC32** (wielomian `0x04C11DB7`, odwrócony, init
-  i final XOR `0xFFFFFFFF`), ale **dane są dopychane zerami do wielokrotności
-  4 bajtów, i to zawsze o 1 do 4 bajtów, nigdy o 0**. W Pythonie:
-  `zlib.crc32(data + b'\0' * (4 - len(data) % 4))`.
-- Komendy z payloadem mają sumę **XOR po wszystkich bajtach żądania**, razem
-  z `0xA5` i bajtem długości.
-- `GET_LIDAR_CONF` (`0x84`) z polem `0x1CCC0` zwraca adres IP, maskę i bramę
-  zapisane w czujniku – stąd diagnostyka wie, pod czym czujnik ma siedzieć.
+```
+=== 4/5 Tryby skanu ===
+       [0] Standard        62.00 us/probke   do   16 m   format 0x81
+       [1] DenseBoost      31.00 us/probke   do   30 m   format 0x85
+       [2] UltraDense      31.00 us/probke   do   30 m   format 0x86
+       [3] Sensitivity     31.00 us/probke   do   30 m   format 0x83  <- zalecany
 
-### Test z linii poleceń
-
-```powershell
-# siec, ping, model, tryby, 4 s odbioru
-powershell -ExecutionPolicy Bypass -File scripts\test-lidar.ps1
-
-# samo znalezienie czujnika (zapisuje adres dla TouchDesignera)
-powershell -ExecutionPolicy Bypass -File scripts\find-lidar.ps1
-
-# konkretny adres, dłuższy pomiar
-powershell -ExecutionPolicy Bypass -File scripts\test-lidar.ps1 -Ip 192.168.11.2 -Seconds 10
+=== 5/5 Odbior danych (4 s, tryb Sensitivity) ===
+  [OK] ramek: 1335 (334/s), probek: 128160 (32,017/s)
+  [OK] obrotow: 40.3, ~605 rpm
+  [OK] pokrycie kata: 96% z 360 stopni
 ```
 
-### Własny kod w TouchDesignerze
+Odznacz **Active** albo zamknij TD, zanim to uruchomisz. UDP nie jest na wyłączność,
+nic się nie zablokuje, ale czujnik wysyła strumień temu, kto ostatni poprosił.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\test-lidar.ps1 -Ip 192.168.11.2 -Seconds 10
+powershell -ExecutionPolicy Bypass -File scripts\find-lidar.ps1
+```
+
+## Problemy
+
+| Objaw | Przyczyna |
+|---|---|
+| `status`: BRAK POLACZENIA, głowica się kręci | Komputer nie ma adresu w podsieci czujnika |
+| Ping do `192.168.11.2` nie przechodzi | Kabel w innym gnieździe niż to, które dostało adres |
+| Głowica nie kręci się wcale | Brak zasilacza — Ethernet nie zasila czujnika |
+| Instalator nie widzi karty Ethernet z wpiętym kablem | Laptop bez gniazda LAN albo kabel wpięty do switcha stojącego obok |
+| Adres znikł po restarcie | `New-NetIPAddress` dodaje trwale — coś przestawia kartę na DHCP, zwykle oprogramowanie producenta laptopa |
+| Strumień rwany, `bledow` rośnie | Dwa programy naraz czytają czujnik; dane idą do ostatniego, który poprosił |
+| Gubienie danych w sieci z innymi urządzeniami | ~20 Mbit/s ciągłego UDP nie przejdzie przez przeciążony switch ani Wi-Fi. Kabel prosto do komputera |
+| Obiekty tam, gdzie nikogo nie ma | Kierunki bez odbicia podczas nauki są traktowane jako otwarta przestrzeń. Zmniejsz **Zasięg max** albo zwiększ **Margines tła** |
+| Widać tylko wycinek z 360° | Coś zasłania głowicę: taśma, własny kabel, obudowa |
+| Czarne, szklane i lustrzane powierzchnie niewidoczne | Fizyka lidaru, do obejścia tylko ustawieniem czujnika |
+| Dane zamarzły, obraz płynie dalej | Script CHOP/TOP bez wejścia nigdy nie jest brudny. Komponent gotuje je ręcznie w Execute DAT `exec` — przepisując kod, nie zgub tego |
+| TD zapisał projekt „with errors" | Socket, wątek i Tracker się nie marynują; komponent czyści je w `onProjectPreSave` |
+
+## Protokół
+
+Sprawdzone na S2E, firmware 1.02, hardware 18.
+
+- **Kanał UDP jest przezroczysty.** Slamtec w `sl_udp_channel.cpp` traktuje go jak port
+  szeregowy: te same komendy `0xA5 <komenda> …`, ten sam deskryptor `0xA5 0x5A`.
+  Każdy datagram to dokładnie jedna ramka, nie trzeba sklejać strumienia.
+- **Tryb Sensitivity nadaje ramki HQ, nie kapsuły express.** Ramka 781 B: `0xA5`,
+  znacznik czasu (u64), 96 próbek po 8 B (kąt Q14 u16, odległość Q2 u32, jakość u8,
+  flagi u8), CRC32.
+- Kąt i odległość są w każdej próbce wprost: kąt = `angle_q14 · 90 / 2^14` stopni,
+  odległość = `dist_q2 / 4` mm. Bez rozkładania kątów między kapsułami jak w A2.
+- Bit 0 flag to bit synchronizacji i **zapala się raz na obrót** — w odróżnieniu od
+  kapsuł express z A2, gdzie nie zapalał się nigdy.
+- **CRC32 Slamteca to zwykły CRC32** (`0x04C11DB7`, odwrócony, init i final XOR
+  `0xFFFFFFFF`), ale dane są dopychane zerami do wielokrotności 4 bajtów — zawsze
+  o 1 do 4 bajtów, nigdy o 0. W Pythonie:
+  `zlib.crc32(data + b'\0' * (4 - len(data) % 4))`.
+- Komendy z payloadem mają XOR po **wszystkich** bajtach żądania, razem z `0xA5`
+  i bajtem długości.
+- `GET_LIDAR_CONF` (`0x84`) z polem `0x1CCC0` zwraca IP, maskę i bramę zapisane
+  w czujniku — stąd diagnostyka wie, pod czym czujnik ma siedzieć.
+
+## Implementacja
+
+- Czytanie socketu w osobnym wątku, `scan` tylko przepisuje ostatni stan — zatkane
+  gotowanie sieci TD nie gubi próbek.
+- Jeden trwały pierścień 1024 kubełków ze znacznikiem obrotu na każdym, zamiast
+  podwójnego bufora. Nie ma szwu na 0°, a kubełek bez odbicia starzeje się i gaśnie.
+- Rejestr sterownika w `builtins`: przeładowanie DAT-u albo skasowanie komponentu
+  zostawiało wcześniej żywy wątek, który dalej wyrywał czujnikowi strumień.
+- Socket zamyka sam wątek — zamknięcie pod działającym wątkiem zostawia go w pętli
+  mielącej wyjątki.
+
+## Własny kod
 
 ```python
 drv = mod('/project1/s2e/s2e_driver').acquire(ip='auto')
@@ -318,8 +228,8 @@ for b in logic.blobs(mask, dist):
     print(b['x'], b['y'], b['dist'], b['width'])
 ```
 
-Sterownik nie korzysta z niczego z TouchDesignera, więc da się go uruchomić
-także w zwykłym Pythonie (potrzebne tylko `numpy`):
+Sterownik nie używa niczego z TouchDesignera, więc chodzi też w zwykłym Pythonie
+(potrzebne `numpy`):
 
 ```python
 import sys; sys.path.insert(0, r'...\td\src')
@@ -327,41 +237,37 @@ import s2e_driver as D
 drv = D.acquire(ip=D.autodetect())
 ```
 
-### Przebudowa komponentu ze źródeł
+## Przebudowa komponentu
 
-Pliki w `td\src\` są **źródłem prawdy**, a `.tox` to ich spakowana kopia. Po zmianie
-pliku trzeba go wczytać z powrotem – inaczej TouchDesigner dalej pracuje na starej
-wersji i nic tego nie zgłosi:
-
-W **Textporcie** TouchDesignera (Alt+T):
+`td\src\` to źródło prawdy, `.tox` to jego spakowana kopia. Po zmianie pliku trzeba
+go wczytać z powrotem — TD dalej pracuje na starej wersji i nic nie zgłosi.
+W Textporcie (Alt+T):
 
 ```python
-SRC = r'C:\...\rplidar-s2e-windows\td\src'
+SRC = r'...\rplidar-s2e-windows\td\src'
 exec(open(SRC + r'\build_s2e.py', encoding='utf-8').read())
-op('/project1/s2e').save(r'C:\...\rplidar-s2e-windows\td\rplidar_s2e.tox')
+op('/project1/s2e').save(r'...\rplidar-s2e-windows\td\rplidar_s2e.tox')
 ```
 
-Skrypt musi dostać **jedną** przestrzeń nazw. Jeśli wywołasz go z osobnym
-słownikiem lokalnym (`exec(kod, globalne, lokalne)`), funkcje w środku nie
-zobaczą `import os` z góry pliku i dostaniesz
-`NameError: name 'os' is not defined`.
+Skrypt musi dostać jedną przestrzeń nazw. Z osobnym słownikiem lokalnym
+(`exec(kod, globalne, lokalne)`) funkcje w środku nie zobaczą `import os` z góry pliku
+i dostaniesz `NameError: name 'os' is not defined`.
 
-## Pliki w paczce
+## Pliki
 
 | Plik | Do czego |
 |---|---|
-| `INSTALUJ.bat` | instalacja (UAC tylko przy ustawianiu adresu karty) |
-| `sprawdz-lidar.bat` | diagnostyka czujnika bez TouchDesignera |
+| `INSTALUJ.bat` / `odinstaluj.bat` | instalacja / usunięcie skrótów, zapamiętanego adresu i dodanego IP |
+| `sprawdz-lidar.bat` | diagnostyka bez TouchDesignera |
 | `znajdz-lidar.bat` | sama autodetekcja adresu |
-| `odinstaluj.bat` | usuwa skróty, zapamiętany adres i dodany adres IP |
 | `scripts\s2e.ps1` | protokół S2E po UDP w czystym PowerShellu |
 | `scripts\net-setup.ps1` | jedyny krok wymagający administratora |
 | `scripts\find-lidar.ps1`, `test-lidar.ps1` | autodetekcja i diagnostyka |
-| `td\RPLidarS2E.toe` | gotowy projekt z komponentem i demem |
-| `td\rplidar_s2e.tox` | sam komponent – przeciągnij do swojego projektu |
-| `td\src\` | źródła wszystkich DAT-ów + `build_s2e.py`, który składa komponent |
+| `td\RPLidarS2E.toe` | projekt z komponentem i demem |
+| `td\rplidar_s2e.tox` | sam komponent |
+| `td\src\` | źródła DAT-ów + `build_s2e.py` |
 
 ## Licencja
 
-MIT – patrz [LICENSE](LICENSE). Opis protokołu na podstawie publicznej dokumentacji
+MIT, patrz [LICENSE](LICENSE). Opis protokołu na podstawie publicznej dokumentacji
 Slamteca i `rplidar_sdk` (BSD-2), patrz [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
