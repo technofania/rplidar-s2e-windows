@@ -1,9 +1,13 @@
 # build_s2e.py - buduje komponent /project1/s2e i proste demo.
 #
-# Wykonywany WEWNATRZ TouchDesignera (Textport albo MCP 'run'):
+# Wykonywany WEWNATRZ TouchDesignera, w Textporcie (Alt+T):
 #
 #   SRC = r'C:\sciezka\do\paczki\td\src'
 #   exec(open(SRC + '/build_s2e.py', encoding='utf-8').read())
+#
+# Wazne: exec musi dostac JEDNA przestrzen nazw. Przy exec(kod, globalne,
+# lokalne) przypisania z gory pliku laduja w lokalnych, a funkcje szukaja nazw
+# w globalnych - i _read() wywala sie na "name 'os' is not defined".
 #
 # Skrypt wczytuje teksty DAT-ow z plikow .py/.frag lezacych obok siebie, wiec
 # zrodlem prawdy sa pliki, a .tox jest tylko ich spakowana kopia. Po kazdej

@@ -6,6 +6,13 @@ instalowania czegokolwiek w systemie. Skan na żywo, nauka tła pustego
 pomieszczenia, wykrywanie i śledzenie ludzi, wyjście OSC i gotowy projekt
 do przerabiania.
 
+| Co widzi czujnik | Demo reagujące na ludzi |
+|---|---|
+| ![widok z góry](docs/widok.png) | ![demo](docs/demo.png) |
+
+*Po lewej: biały – skan na żywo, niebieski – nauczone tło, czerwony – to, czego
+w pustym pokoju nie było, zielone kółka – śledzone obiekty.*
+
 > **S2E to wersja ethernetowa.** Nie ma portu COM, nie ma przejściówki USB
 > i nie ma czym kręcić silnikiem – głowica kręci się, odkąd czujnik ma prąd.
 > Jeśli masz A1, A2 albo A3 na USB, to jest osobna paczka:
@@ -326,11 +333,18 @@ Pliki w `td\src\` są **źródłem prawdy**, a `.tox` to ich spakowana kopia. Po
 pliku trzeba go wczytać z powrotem – inaczej TouchDesigner dalej pracuje na starej
 wersji i nic tego nie zgłosi:
 
+W **Textporcie** TouchDesignera (Alt+T):
+
 ```python
 SRC = r'C:\...\rplidar-s2e-windows\td\src'
-exec(open(SRC + r'\build_s2e.py', encoding='utf-8').read(), {'SRC': SRC, 'me': me})
+exec(open(SRC + r'\build_s2e.py', encoding='utf-8').read())
 op('/project1/s2e').save(r'C:\...\rplidar-s2e-windows\td\rplidar_s2e.tox')
 ```
+
+Skrypt musi dostać **jedną** przestrzeń nazw. Jeśli wywołasz go z osobnym
+słownikiem lokalnym (`exec(kod, globalne, lokalne)`), funkcje w środku nie
+zobaczą `import os` z góry pliku i dostaniesz
+`NameError: name 'os' is not defined`.
 
 ## Pliki w paczce
 
